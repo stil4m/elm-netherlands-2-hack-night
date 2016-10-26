@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Elm Netherlands 2 - Hack Night</title>
+    <script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://aui-cdn.atlassian.com/aui-adg/5.10.1/css/aui.css">
+    <link rel="stylesheet" type="text/css" href="./main.css">
+
+</head>
+
+<body id="app-content">
+    <script type="text/javascript" src="./main.js"></script>
+    <script>
+        var node = document.getElementById('app-content');
+        var app = Elm.App.embed(node);
+
+        var config = {
+            apiKey: "AIzaSyBlHnmufONC8oHy-jr3rgmzkgv8Mb_c6yE",
+            authDomain: "elm-netherlands-2-hack-night.firebaseapp.com",
+            databaseURL: "https://elm-netherlands-2-hack-night.firebaseio.com",
+            storageBucket: "elm-netherlands-2-hack-night.appspot.com",
+            messagingSenderId: "767217005991"
+        };
+        firebase.initializeApp(config);
+
+        firebase.database().ref('projects').on('value', function(snapshot) {
+            var projects = [];
+            snapshot.forEach(function(item) {
+                var value = item.val();
+                value.key = item.key;
+                projects.push(value);
+            });
+            app.ports.projects.send(projects);
+        });
+
+        app.ports.createProject.subscribe(function(n) {
+            var projectsRef = firebase.database().ref('projects');
+            var newProjectRef = projectsRef.push();
+            delete n['key'];
+            newProjectRef.set(n);
+        });
+    </script>
+</body>
+
+</html>
